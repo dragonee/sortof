@@ -155,7 +155,13 @@ def main():
 
     arguments = docopt(__doc__, version=VERSION)
 
-    clean_loop(arguments['PATH'], arguments['DESTINATION'])
+    try:
+        clean_loop(arguments['PATH'], arguments['DESTINATION'])
+    except KeyboardInterrupt:
+        print("")
+
+    p = Path(arguments['PATH'])
+    print("{} files left in {}".format(sum(1 for _ in p.iterdir()), p))
 
 
 if __name__ == "__main__":
