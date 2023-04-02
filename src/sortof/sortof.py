@@ -46,7 +46,7 @@ def input_until_valid(
 
 Choice = namedtuple('Choice', ['name', 'description'], defaults=[''])
 
-def ask_for_choices(choices, case_sensitive=True):
+def ask_for_choices(choices, case_sensitive=True, read=""):
     prompt = "[{},?] ".format(
         ",".join([choice.name.capitalize() for choice in choices])
     )
@@ -69,6 +69,11 @@ def ask_for_choices(choices, case_sensitive=True):
     else:
         match = lambda x, y: x.lower() == y.lower()
 
+    if read:
+        for choice in choices:
+            if match(read[0], choice.name[0]):
+                return (choice.name, read[1:])
+
     while True:
         s = input(prompt)
 
@@ -77,9 +82,8 @@ def ask_for_choices(choices, case_sensitive=True):
             continue
 
         for choice in choices:
-            if match(s, choice.name[0]):
-                return choice.name
-
+            if match(s[0], choice.name[0]):
+                return (choice.name, s[1:])
 
 
 def clean_loop(path, destination):
@@ -106,7 +110,7 @@ def clean_loop(path, destination):
         print(foreground_color + str(subpath.name) + Style.RESET_ALL)
 
         while True:
-            response = ask_for_choices([
+            response, tail = ask_for_choices([
                 Choice("skip", "Go to the next item"),
                 Choice("move", "Move to other directory"),
                 Choice("open", "Open the file"),
@@ -117,7 +121,7 @@ def clean_loop(path, destination):
                 break
             
             if response == "move":
-                directory = ask_for_choices(move_choices)
+                directory, _ = ask_for_choices(move_choices, case_sensitive=False, read=tail)
 
                 if directory == '!':
                     continue
@@ -129,7 +133,7 @@ def clean_loop(path, destination):
                 subprocess.Popen(["open", subpath], start_new_session=True)
             
             if response == "create":
-                directory = input_until_valid("mkdir:", "Input new directory name")
+                directory = input_until_valid("mkdir: ", "Input new directory name")
 
                 new_dir = dest/directory
                 new_dir.mkdir(exist_ok=True)
