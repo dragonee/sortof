@@ -95,9 +95,9 @@ def clean_loop(path, destination):
         if not subdest.is_dir():
             continue
         
-        move_choices.append[
+        move_choices.append(
             Choice(subdest.name)
-        ]
+        )
 
 
     for subpath in p.iterdir():
