@@ -10,6 +10,7 @@ Options:
     --version       Show version information.
 """
 
+from email.policy import default
 from docopt import docopt
 from pathlib import Path
 from collections import namedtuple
@@ -46,7 +47,7 @@ def input_until_valid(
 
 Choice = namedtuple('Choice', ['name', 'description'], defaults=[''])
 
-def ask_for_choices(choices, case_sensitive=True, read=""):
+def ask_for_choices(choices, case_sensitive=True, read="", default=None):
     prompt = "[{},?] ".format(
         ",".join([choice.name.capitalize() for choice in choices])
     )
@@ -80,6 +81,9 @@ def ask_for_choices(choices, case_sensitive=True, read=""):
         if s == '?':
             print_description()
             continue
+
+        if s == '' and default:
+            return (default, '')
 
         for choice in choices:
             if match(s[0], choice.name[0]):
@@ -115,7 +119,7 @@ def clean_loop(path, destination):
                 Choice("move", "Move to other directory"),
                 Choice("open", "Open the file"),
                 Choice("create", "Create a directory and then move"),
-            ])
+            ], default="open")
 
             if response == "skip":
                 break
