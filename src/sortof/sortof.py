@@ -10,7 +10,6 @@ Options:
     --version       Show version information.
 """
 
-from email.policy import default
 from docopt import docopt
 from pathlib import Path
 from collections import namedtuple
